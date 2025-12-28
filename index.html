@@ -110,7 +110,7 @@
 <script>
 let reminders = [];
 
-// ✅ إعدادات Firebase
+// ✅ كود Firebase الخاص بك
 const firebaseConfig = {
   apiKey: "AIzaSyBvzdxIg12wzWobOco5WmcWR5oVdoVnsTM",
   authDomain: "reminders-app-5c038.firebaseapp.com",
@@ -123,37 +123,29 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
-// ⚠️ مفتاح VAPID العام
+// ⚠️ ضعي هنا مفتاح VAPID العام من Cloud Messaging
 const vapidKey = "BObrXKIcIqwJFN0gYxjNMuZ2xjE2YPIOSdj4n3TcVrfE_n_fpcxTaq12i1kT8qCKhTb1rJMCntIBmQTfrjQvQXw";
 
 // تسجيل Service Worker
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/909-reminders-app/firebase-messaging-sw.js')
-    .then(() => console.log('Service Worker مسجّل'))
-    .catch(err => console.error('فشل تسجيل SW', err));
+ navigator.serviceWorker.register('/909-reminders-app/firebase-messaging-sw.js')
+  .then(() => console.log('Service Worker مسجّل'))
+  .catch(err => console.error('فشل تسجيل SW', err));
+
 }
 
 // زر تفعيل الإشعارات
 document.getElementById('enablePush').addEventListener('click', async () => {
-  try {
-    const permission = await Notification.requestPermission();
-    if (permission !== 'granted') {
-      alert('تم رفض الإذن. الإشعارات لن تعمل.');
-      return;
-    }
-    const token = await messaging.getToken({ vapidKey });
-    if (!token) {
-      console.error('لم يتم الحصول على التوكن. تحقق من VAPID أو الإذن.');
-      alert('تعذر الحصول على التوكن ❌');
-      return;
-    }
-    console.log('FCM token:', token);
-    alert('تم تفعيل الإشعارات ✅');
-  } catch (err) {
-    console.error('خطأ أثناء التفعيل:', err);
-    alert('حدث خطأ أثناء التفعيل ❌');
+  const permission = await Notification.requestPermission();
+  if (permission !== 'granted') {
+    alert('تم رفض الإذن. الإشعارات لن تعمل.');
+    return;
   }
+  const token = await messaging.getToken({ vapidKey });
+  console.log('FCM token:', token);
+  alert('تم تفعيل الإشعارات ✅');
 });
+
 
 // زر اختبار الصوت
 function testSound(){
@@ -189,19 +181,17 @@ function renderTables(){
   tbody.innerHTML='';
   reminders.forEach(r=>{
     const tr=document.createElement('tr');
-    tr.innerHTML=`<td>${r.title}</td><td>${r.type}</td><td>${r.date}</td><td>${r.time}</td>`;
+        tr.innerHTML=`<td>${r.title}</td><td>${r.type}</td><td>${r.date}</td><td>${r.time}</td>`;
     tbody.appendChild(tr);
   });
 }
 
-// فتح النافذة المنبثقة
 function openPopup(text){
   document.getElementById('popupText').textContent=text;
   document.getElementById('popupOverlay').style.display='block';
   document.getElementById('popup').style.display='block';
 }
 
-// إغلاق النافذة المنبثقة
 function closePopup(){
   document.getElementById('popupOverlay').style.display='none';
   document.getElementById('popup').style.display='none';
