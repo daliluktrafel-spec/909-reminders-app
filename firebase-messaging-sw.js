@@ -1,39 +1,33 @@
-/* firebase-messaging-sw.js */
+// firebase-messaging-sw.js
 
-// استقبال رسائل Push من Firebase
-self.addEventListener('push', (event) => {
-  const data = event.data ? event.data.json() : {};
-  const n = data.notification || {};
-  const d = data.data || {};
+// استيراد مكتبات Firebase
+importScripts('https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.14.0/firebase-messaging-compat.js');
 
-  const title = n.title || '🔔 تنبيه التذكير';
-  const body  = n.body  || d.body || 'حان وقت التذكير';
-  const icon  = n.icon  || '/icon.png'; // يمكنك وضع أيقونة بجانب الملفات
-
-  event.waitUntil(
-    self.registration.showNotification(title, {
-      body,
-      icon,
-      tag: n.tag || d.id || Date.now().toString(),
-      data: { url: d.url || '/', ...d },
-      vibrate: [200, 100, 200]
-    })
-  );
+// نفس إعدادات Firebase الخاصة بمشروعك
+firebase.initializeApp({
+  apiKey: "AIzaSyBvzdxIg12wzWobOco5WmcWR5oVdoVnsTM",
+  authDomain: "reminders-app-5c038.firebaseapp.com",
+  projectId: "reminders-app-5c038",
+  storageBucket: "reminders-app-5c038.appspot.com",
+  messagingSenderId: "864515961662",
+  appId: "1:864515961662:web:4d6afea2d97d07d859b26f",
+  measurementId: "G-MQVVLYJ4H3"
 });
 
-// عند الضغط على الإشعار
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close();
-  const url = (event.notification.data && event.notification.data.url) || '/';
+// تهيئة Messaging
+const messaging = firebase.messaging();
 
-  event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(winClients => {
-      for (const client of winClients) {
-        const target = new URL(url, self.location.origin).pathname;
-        const current = new URL(client.url).pathname;
-        if (current === target) return client.focus();
-      }
-      return clients.openWindow(url);
-    })
-  );
+// استقبال الإشعارات في الخلفية
+messaging.onBackgroundMessage((payload) => {
+  console.log('[firebase-messaging-sw.js] Received background message ', payload);
+
+  const notificationTitle = payload.notification?.title || "🔔 تنبيه جديد";
+  const notificationOptions = {
+    body: payload.notification?.body || "لديك تذكير جديد",
+    icon: "/icon.png" // ضع أي أيقونة هنا إذا أردت
+  };
+
+  self.registration.showNotification(notificationTitle, notificationOptions);
 });
+
