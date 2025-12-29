@@ -131,93 +131,93 @@ if ('serviceWorker' in navigator) {
  navigator.serviceWorker.register('/909-reminders-app/firebase-messaging-sw.js')
   .then(() => console.log('Service Worker مسجّل'))
   .catch(err => console.error('فشل تسجيل SW', err));
-
 }
 
-// زر تفعيل الإشعارات
-document.getElementById('enablePush').addEventListener('click', async () => {
-  const permission = await Notification.requestPermission();
-  if (permission !== 'granted') {
-    alert('تم رفض الإذن. الإشعارات لن تعمل.');
-    return;
-  }
-  const token = await messaging.getToken({ vapidKey });
-  console.log('FCM token:', token);
-  alert('تم تفعيل الإشعارات ✅');
-});
-
-
-// زر اختبار الصوت
-function testSound(){
-  try {
-    const audio = new Audio("https://www.soundjay.com/button/beep-07.wav");
-    audio.play();
-    alert("تم تشغيل الصوت ✅");
-  } catch(e){
-    alert("تعذر تشغيل الصوت ❌");
-  }
-}
-
-// إضافة تذكير
-function addReminder(){
-  const title = document.getElementById('title').value.trim();
-  const type = document.getElementById('type').value;
-  const date = document.getElementById('date').value;
-  const time = document.getElementById('time').value;
-
-  if(!title || !date || !time){ 
-    alert("⚠️ أدخل كل البيانات"); 
-    return; 
-  }
-
-  reminders.push({title,type,date,time});
-  renderTables();
-  alert("✅ تم حفظ التذكير");
-}
-
-// عرض التذكيرات
-function renderTables(){
-  const tbody = document.getElementById('upcomingTable').querySelector('tbody');
-  tbody.innerHTML='';
-  reminders.forEach(r=>{
-    const tr=document.createElement('tr');
-        tr.innerHTML=`<td>${r.title}</td><td>${r.type}</td><td>${r.date}</td><td>${r.time}</td>`;
-    tbody.appendChild(tr);
+window.onload = () => {
+  // زر تفعيل الإشعارات
+  document.getElementById('enablePush').addEventListener('click', async () => {
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') {
+      alert('تم رفض الإذن. الإشعارات لن تعمل.');
+      return;
+    }
+    const token = await messaging.getToken({ vapidKey });
+    console.log('FCM token:', token);
+    alert('تم تفعيل الإشعارات ✅');
   });
-}
 
-function openPopup(text){
-  document.getElementById('popupText').textContent=text;
-  document.getElementById('popupOverlay').style.display='block';
-  document.getElementById('popup').style.display='block';
-}
+  // زر اختبار الصوت
+  function testSound(){
+    try {
+      const audio = new Audio("https://www.soundjay.com/button/beep-07.wav");
+      audio.play();
+      alert("تم تشغيل الصوت ✅");
+    } catch(e){
+      alert("تعذر تشغيل الصوت ❌");
+    }
+  }
 
-function closePopup(){
-  document.getElementById('popupOverlay').style.display='none';
-  document.getElementById('popup').style.display='none';
-}
+  // إضافة تذكير
+  function addReminder(){
+    const title = document.getElementById('title').value.trim();
+    const type = document.getElementById('type').value;
+    const date = document.getElementById('date').value;
+    const time = document.getElementById('time').value;
 
-// استقبال رسالة أثناء فتح الصفحة من Firebase
-messaging.onMessage((payload) => {
-  const n = payload.notification || {};
-  const d = payload.data || {};
-  const title = n.title || 'تنبيه التذكير';
-  const body  = n.body  || d.body || `${d.type || ''} - ${d.title || ''} (${d.date || ''} ${d.time || ''})`;
+    if(!title || !date || !time){ 
+      alert("⚠️ أدخل كل البيانات"); 
+      return; 
+    }
 
-  openPopup(`${title}\n${body}`);
-  try { new Audio("https://www.soundjay.com/button/beep-07.wav").play(); } catch(e){}
-});
+    reminders.push({title,type,date,time});
+    renderTables();
+       alert("✅ تم حفظ التذكير");
+  }
 
-// تهيئة Flatpickr
-flatpickr("#date",{locale:"ar",dateFormat:"Y-m-d"});
-flatpickr("#time",{enableTime:true,noCalendar:true,dateFormat:"H:i",time_24hr:true});
+  // عرض التذكيرات
+  function renderTables(){
+    const tbody = document.getElementById('upcomingTable').querySelector('tbody');
+    tbody.innerHTML='';
+    reminders.forEach(r=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td>${r.title}</td><td>${r.type}</td><td>${r.date}</td><td>${r.time}</td>`;
+      tbody.appendChild(tr);
+    });
+  }
 
-// التبويبات
-function showTab(tab){
-  document.querySelectorAll('.tab-content').forEach(el=>el.style.display='none');
-  document.getElementById(tab).style.display='block';
-}
-showTab('tab-new');
+  function openPopup(text){
+    document.getElementById('popupText').textContent=text;
+    document.getElementById('popupOverlay').style.display='block';
+    document.getElementById('popup').style.display='block';
+  }
+
+  function closePopup(){
+    document.getElementById('popupOverlay').style.display='none';
+    document.getElementById('popup').style.display='none';
+  }
+
+  // استقبال رسالة أثناء فتح الصفحة من Firebase
+  messaging.onMessage((payload) => {
+    const n = payload.notification || {};
+    const d = payload.data || {};
+    const title = n.title || 'تنبيه التذكير';
+    const body  = n.body  || d.body || `${d.type || ''} - ${d.title || ''} (${d.date || ''} ${d.time || ''})`;
+
+    openPopup(`${title}\n${body}`);
+    try { new Audio("https://www.soundjay.com/button/beep-07.wav").play(); } catch(e){}
+  });
+
+  // تهيئة Flatpickr
+  flatpickr("#date",{locale:"ar",dateFormat:"Y-m-d"});
+  flatpickr("#time",{enableTime:true,noCalendar:true,dateFormat:"H:i",time_24hr:true});
+
+  // التبويبات
+  function showTab(tab){
+    document.querySelectorAll('.tab-content').forEach(el=>el.style.display='none');
+    document.getElementById(tab).style.display='block';
+  }
+  showTab('tab-new');
+};  <!-- إغلاق صحيح لـ window.onload -->
 </script>
 
 <!-- أزرار التبويبات -->
@@ -226,6 +226,5 @@ showTab('tab-new');
   <button onclick="showTab('tab-upcoming')">📅 القادمة</button>
 </div>
 
-</script>
 </body>
 </html>
