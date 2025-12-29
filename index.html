@@ -120,17 +120,19 @@ const messaging = firebase.messaging();
 
 const vapidKey = "BObrXKIcIqwJFN0gYxjNMuZ2xjE2YPIOSdj4n3TcVrfE_n_fpcxTaq12i1kT8qCKhTb1rJMCntIBmQTfrjQvQXw";
 
-// تسجيل Service Worker
-if ('serviceWorker' in navigator) { navigator.serviceWorker.register('firebase-messaging-sw.js') // ✅ تعديل المسار ليكون نسبي .then(() => console.log('Service Worker مسجّل')) .catch(err => console.error('فشل تسجيل SW', err)); }
+// تسجيل Service Worker (المسار نسبي بجانب index.html)
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('firebase-messaging-sw.js')
+    .then(() => console.log('Service Worker مسجّل'))
+    .catch(err => console.error('فشل تسجيل SW', err));
+}
 
 /* الدوال */
-
 function testSound(){
   const audio = new Audio("https://www.soundjay.com/button/beep-07.wav");
   audio.play();
 }
 
-/* ✅ التعديل الوحيد هنا */
 function addReminder(){
   const title = document.getElementById("title").value.trim();
   const type  = document.getElementById("type").value;
@@ -158,14 +160,14 @@ function renderTables(){
 }
 
 function openPopup(text){
-  popupText.textContent=text;
-  popupOverlay.style.display='block';
-  popup.style.display='block';
+  document.getElementById('popupText').textContent=text;
+  document.getElementById('popupOverlay').style.display='block';
+  document.getElementById('popup').style.display='block';
 }
 
 function closePopup(){
-  popupOverlay.style.display='none';
-  popup.style.display='none';
+  document.getElementById('popupOverlay').style.display='none';
+  document.getElementById('popup').style.display='none';
 }
 
 function showTab(tab){
@@ -174,7 +176,6 @@ function showTab(tab){
 }
 
 window.onload = () => {
-
   document.getElementById('enablePush').addEventListener('click', async () => {
     const permission = await Notification.requestPermission();
     if (permission !== 'granted') {
