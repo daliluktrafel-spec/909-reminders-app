@@ -121,9 +121,7 @@ const messaging = firebase.messaging();
 const vapidKey = "BObrXKIcIqwJFN0gYxjNMuZ2xjE2YPIOSdj4n3TcVrfE_n_fpcxTaq12i1kT8qCKhTb1rJMCntIBmQTfrjQvQXw";
 
 // تسجيل Service Worker
-if ('serviceWorker' in navigator) {
- navigator.serviceWorker.register('/909-reminders-app/firebase-messaging-sw.js');
-}
+if ('serviceWorker' in navigator) { navigator.serviceWorker.register('firebase-messaging-sw.js') // ✅ تعديل المسار ليكون نسبي .then(() => console.log('Service Worker مسجّل')) .catch(err => console.error('فشل تسجيل SW', err)); }
 
 /* الدوال */
 
